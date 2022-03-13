@@ -17,7 +17,7 @@ public class TodoService {
   }
 
   public Todo getById(int id) {
-    return todoRepository.getById(id);
+    return todoRepository.findById(id).orElseGet(null);
   }
 
   public void deleteTodoById(int id) {
