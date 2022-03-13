@@ -25,6 +25,5 @@ public class Course {
   private String description;
   private String status;
 
-  @Column(name = "username")
   private String username;
 }

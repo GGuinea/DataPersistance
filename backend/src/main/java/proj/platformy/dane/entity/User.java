@@ -14,14 +14,15 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "user")
+@Table(name = "users")
 public class User {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private int id;
 
-  @Column(name = "username", unique = true)
+  @Column(unique = true)
   private String username;
   private String password;
+  private String email;
 }

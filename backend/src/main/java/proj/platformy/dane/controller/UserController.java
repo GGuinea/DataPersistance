@@ -11,11 +11,15 @@ import proj.platformy.dane.entity.User;
 import proj.platformy.dane.service.UserService;
 
 @RestController
-@CrossOrigin(origins = {"http://localhost:3000"})
 public class UserController {
 
   @Autowired
   private UserService userService;
+
+  @PostMapping("/test")
+  private String connectionTest() {
+    return "Working";
+  }
 
   @GetMapping("/login")
   private User getCurrentUser(@RequestBody User user) {

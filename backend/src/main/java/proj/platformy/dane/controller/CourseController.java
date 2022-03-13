@@ -14,9 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import proj.platformy.dane.entity.Course;
 import proj.platformy.dane.service.CourseService;
 
-@Slf4j
 @RestController
-@CrossOrigin(origins = { "http://localhost:3000"})
 public class CourseController {
 
   @Autowired
@@ -24,7 +22,6 @@ public class CourseController {
 
   @PostMapping("/addCourse")
   public Course addCourse(@RequestBody Course course) {
-    log.info("Course object {}", course.toString());
     return courseService.saveCourse(course);
   }
 
