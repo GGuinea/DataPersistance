@@ -1,4 +1,4 @@
-package proj.platformy.dane.entity;
+package proj.platformy.dane.entity.sql;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -11,10 +11,18 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class Todo {
+
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private int id;
   private String name;
   private String description;
   private String status;
+
+  public Todo(Todo todoItem) {
+    this.id = todoItem.getId();
+    this.name = todoItem.getName();
+    this.description = todoItem.getDescription();
+    this.status = todoItem.getStatus();
+  }
 }
