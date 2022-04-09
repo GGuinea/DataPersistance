@@ -25,4 +25,9 @@ public class Todo {
     this.description = todoItem.getDescription();
     this.status = todoItem.getStatus();
   }
+
+  public Todo(int id, String description) {
+    this.id = id;
+    this.description = description;
+  }
 }

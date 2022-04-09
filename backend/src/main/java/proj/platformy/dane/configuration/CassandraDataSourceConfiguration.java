@@ -20,6 +20,7 @@ import org.springframework.data.cassandra.core.convert.CassandraConverter;
 import org.springframework.data.cassandra.core.convert.MappingCassandraConverter;
 import org.springframework.data.cassandra.core.cql.keyspace.CreateKeyspaceSpecification;
 import org.springframework.data.cassandra.core.cql.keyspace.DataCenterReplication;
+import org.springframework.data.cassandra.core.cql.keyspace.KeyspaceOption;
 import org.springframework.data.cassandra.core.mapping.CassandraMappingContext;
 import org.springframework.data.cassandra.core.mapping.SimpleUserTypeResolver;
 import org.springframework.data.cassandra.repository.config.EnableCassandraRepositories;
@@ -73,7 +74,8 @@ protected Set<Class<?>> getInitialEntitySet() throws ClassNotFoundException {
 @Override
 protected List<CreateKeyspaceSpecification> getKeyspaceCreations() {
     return Arrays.asList(
-            CreateKeyspaceSpecification.createKeyspace(keySpace)
+            CreateKeyspaceSpecification.createKeyspace(keySpace).with(KeyspaceOption.DURABLE_WRITES, true)
+                .withNetworkReplication(DataCenterReplication.of("datacenter1", 1), DataCenterReplication.of("datacenter2", 2))
                     .ifNotExists());
 }
 
