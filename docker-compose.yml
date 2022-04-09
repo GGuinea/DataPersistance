@@ -1,0 +1,95 @@
+version: '3'
+services:
+  elastic-node1:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.1.1
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "512m"
+        max-file: "3"
+    container_name: elastic-node1
+    environment:
+      - cluster.name=elastic-cluster
+      - node.name=elastic-node1
+      - discovery.seed_hosts=elastic-node1
+      - cluster.initial_master_nodes=elastic-node1
+      - bootstrap.memory_lock=true # along with the memlock settings below, disables swapping
+      - "ES_JAVA_OPTS=-Xms4096m -Xmx4096m" # minimum and maximum Java heap size, recommend setting both to 50% of system RAM
+      - xpack.security.enabled=false
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536 # maximum number of open files for the Elasticsearch user, set to at least 65536 on modern systems
+        hard: 65536
+    volumes:
+      - /apps/elasticsearch/data:/home/user/git-repos/personal/studia/utrwalanie/data/
+    ports:
+      - 9200:9200
+      - 9600:9600 # required for Performance Analyzer
+    networks:
+      - elastic-net
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.1.1 
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "512m"
+        max-file: "3"
+    container_name: elastic-kibana
+    ports:
+      - 5601:5601
+    expose:
+      - "5601"
+    environment:
+      ELASTICSEARCH_URL: http://elastic-node1:9200
+      ELASTICSEARCH_HOSTS: http://elastic-node1:9200
+      SERVER_SSL_ENABLED: "false"
+    networks:
+      - elastic-net
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.1.1
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "512m"
+        max-file: "3"
+    ports:
+      - "5044:5044"
+    depends_on:
+      - elastic-node1
+      - db
+
+    environment:
+      ELASTICSEARCH_URL: http://elastic-node1:9200
+      ELASTICSEARCH_HOSTS: http://elastic-node1:9200
+    volumes:
+      - $PWD/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+        #- $PWD/server.crt:/etc/server.crt
+        #- $PWD/server.key:/etc/server.key
+        #- /apps/logstash/data:/usr/share/logstash/data
+        #- /apps/logstash/postgresql-42.3.3.jar:/usr/share/logstash/logstash-core/lib/jars/postgresql-jdbc.jar
+    networks:
+      - elastic-net
+  db:
+    image: postgres:14.1-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    expose:
+      - 5433
+    volumes: 
+        - db:/var/lib/postgresql/data
+    networks:
+      - elastic-net
+volumes:
+  db:
+    driver: local
+
+
+networks:
+  elastic-net:
+    driver: bridge
